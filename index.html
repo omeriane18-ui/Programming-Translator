@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>dotcode — Free AI Code Translator (Python, Java, C++, JS &amp; more)</title>
+<meta name="description" content="dotcode translates code between programming languages using free AI (Groq). Convert Python to Java, C++ to Python, JavaScript to Go and more — free, in your browser, no signup. Fully themeable like a Linux rice.">
+<meta name="keywords" content="code translator, ai code converter, python to java, convert code online, groq api, code transpiler, free code translator">
+<meta name="author" content="Bilal Meriane">
+<link rel="canonical" href="https://dotcode.example/">
+
+<!-- Open Graph -->
+<meta property="og:type" content="website">
+<meta property="og:title" content="dotcode — Free AI Code Translator">
+<meta property="og:description" content="Convert code between programming languages instantly with free AI. Themeable, fast, no backend — runs entirely in your browser.">
+<meta property="og:url" content="https://dotcode.example/">
+<meta property="og:site_name" content="dotcode">
+
+<!-- Twitter -->
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="dotcode — Free AI Code Translator">
+<meta name="twitter:description" content="Convert code between programming languages instantly with free AI. Themeable like a Linux rice.">
+
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='20' fill='%230b0f14'/%3E%3Ctext x='50' y='68' font-size='58' text-anchor='middle' fill='%23e3b341' font-family='monospace'%3E%3E_%3C/text%3E%3C/svg%3E">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "SoftwareApplication",
+  "name": "dotcode",
+  "applicationCategory": "DeveloperApplication",
+  "operatingSystem": "Any (Web Browser)",
+  "description": "AI-powered code-to-code translator that converts source code between programming languages, running entirely in the browser using the Groq API.",
+  "offers": {
+    "@type": "Offer",
+    "price": "0",
+    "priceCurrency": "USD"
+  },
+  "author": {
+    "@type": "Person",
+    "name": "Bilal Meriane"
+  }
+}
+</script>
+</head>
+<body>
+
+<a href="#translate" class="skip-link">Skip to translator</a>
+
+<header class="wm-bar">
+  <div class="wm-left">
+    <span class="wm-logo" aria-hidden="true">&gt;_</span>
+    <span class="wm-title">dotcode</span>
+  </div>
+  <nav class="wm-tabs" aria-label="Primary">
+    <a href="#translate">01 translate</a>
+    <a href="#themes">02 rice</a>
+    <a href="#languages">03 languages</a>
+    <a href="#about">04 about</a>
+  </nav>
+  <div class="wm-status">
+    <span class="status-dot" id="apiStatusDot" title="Groq connection status"></span>
+    <span id="apiStatusLabel">no key</span>
+  </div>
+</header>
+
+<main>
+
+  <!-- ============ HERO / TRANSLATOR ============ -->
+  <section id="translate" class="panel hero">
+    <div class="hero-heading">
+      <h1>Translate code between languages. Free. In your browser.</h1>
+      <p class="hero-sub">Paste source code on the left, pick two languages, hit <strong>run</strong>. Powered by your own free <a href="https://console.groq.com/keys" target="_blank" rel="noopener">Groq API key</a> — nothing is sent to any server but Groq's.</p>
+    </div>
+
+    <details class="key-drawer" id="keyDrawer">
+      <summary>Connect your Groq API key <span class="hint">(free, takes 20 seconds)</span></summary>
+      <div class="key-drawer-body">
+        <label for="groqKey">Groq API key</label>
+        <input type="password" id="groqKey" placeholder="gsk_...">
+        <label for="modelName">Model</label>
+        <input type="text" id="modelName" value="llama-3.3-70b-versatile">
+        <button id="saveKeyBtn" class="btn btn-ghost">Save in this browser</button>
+        <p class="key-note">Stored only in your browser's local storage. Get a free key at <a href="https://console.groq.com/keys" target="_blank" rel="noopener">console.groq.com/keys</a>. If Groq updates their model names, paste the new one here — see <a href="https://console.groq.com/docs/models" target="_blank" rel="noopener">console.groq.com/docs/models</a>.</p>
+      </div>
+    </details>
+
+    <div class="translator">
+      <div class="editor-col">
+        <div class="editor-head">
+          <select id="fromLang" aria-label="Source language"></select>
+          <span class="editor-tag">source</span>
+        </div>
+        <textarea id="sourceCode" class="code-area" spellcheck="false" placeholder="def greet(name):&#10;    print(f&quot;Hello, {name}!&quot;)"></textarea>
+      </div>
+
+      <div class="translate-controls">
+        <button id="translateBtn" class="run-btn" aria-label="Translate code">
+          <span class="run-arrow">▶</span>
+          <span class="run-label">run</span>
+        </button>
+        <button id="swapBtn" class="swap-btn" title="Swap languages" aria-label="Swap languages">⇄</button>
+      </div>
+
+      <div class="editor-col">
+        <div class="editor-head">
+          <select id="toLang" aria-label="Target language"></select>
+          <span class="editor-tag">target</span>
+        </div>
+        <textarea id="outputCode" class="code-area" spellcheck="false" readonly placeholder="Translated code appears here."></textarea>
+        <button id="copyBtn" class="btn btn-ghost copy-btn">Copy</button>
+      </div>
+    </div>
+
+    <p id="statusLine" class="status-line" role="status" aria-live="polite"></p>
+  </section>
+
+  <!-- ============ STEPS (real sequence) ============ -->
+  <section class="panel steps">
+    <ol>
+      <li><span class="step-no">1</span><div><strong>Paste</strong> your code on the left.</div></li>
+      <li><span class="step-no">2</span><div><strong>Pick</strong> a source and target language.</div></li>
+      <li><span class="step-no">3</span><div><strong>Run</strong> — the translation streams into the right pane.</div></li>
+    </ol>
+  </section>
+
+  <!-- ============ RICE / THEME PANEL (signature element) ============ -->
+  <section id="themes" class="panel rice-panel">
+    <h2>Rice it your way</h2>
+    <p class="section-sub">Like a Linux desktop, nothing here is fixed. Pick a preset or drag every value yourself — it's saved on your machine only.</p>
+
+    <div class="rice-grid">
+      <div class="rice-presets" id="ricePresets" role="list" aria-label="Theme presets"></div>
+
+      <div class="rice-controls">
+        <div class="control-row">
+          <label for="accentPicker">Accent color</label>
+          <input type="color" id="accentPicker" value="#e3b341">
+        </div>
+        <div class="control-row">
+          <label for="radiusSlider">Corner radius <span id="radiusVal">6px</span></label>
+          <input type="range" id="radiusSlider" min="0" max="20" value="6">
+        </div>
+        <div class="control-row">
+          <label for="densitySlider">Spacing density <span id="densityVal">100%</span></label>
+          <input type="range" id="densitySlider" min="70" max="140" value="100">
+        </div>
+        <div class="control-row">
+          <label for="fontSizeSlider">Text size <span id="fontSizeVal">15px</span></label>
+          <input type="range" id="fontSizeSlider" min="12" max="20" value="15">
+        </div>
+        <div class="control-row">
+          <label for="fontChoice">Interface font</label>
+          <select id="fontChoice">
+            <option value="'Inter', sans-serif">Inter</option>
+            <option value="'JetBrains Mono', monospace">JetBrains Mono</option>
+            <option value="'Space Grotesk', sans-serif">Space Grotesk</option>
+            <option value="system-ui, sans-serif">System default</option>
+          </select>
+        </div>
+        <div class="control-row">
+          <label for="monoChoice">Code font</label>
+          <select id="monoChoice">
+            <option value="'JetBrains Mono', monospace">JetBrains Mono</option>
+            <option value="ui-monospace, monospace">System monospace</option>
+          </select>
+        </div>
+        <button id="resetThemeBtn" class="btn btn-ghost">Reset to default</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ LANGUAGES / PRICING ============ -->
+  <section id="languages" class="panel languages-panel">
+    <h2>Languages</h2>
+    <p class="section-sub">7 languages are free, forever, no account needed. More languages unlock with a subscription.</p>
+    <div class="lang-grid" id="langGrid"></div>
+    <p class="unlock-note">Want the locked languages? Email <a href="mailto:omeriane0@gmail.com?subject=dotcode%20-%20unlock%20languages">omeriane0@gmail.com</a> to subscribe.</p>
+  </section>
+
+  <!-- ============ ABOUT ============ -->
+  <section id="about" class="panel about-panel">
+    <h2>About</h2>
+    <p>dotcode is built and maintained by <strong>Bilal Meriane</strong> (مريان بلال). It runs entirely as static files — no server, no database, no tracking. Translation is powered by your own free Groq API key, and hosting is free on GitHub Pages.</p>
+    <p>For subscriptions, feature requests, or bug reports: <a href="mailto:omeriane0@gmail.com">omeriane0@gmail.com</a></p>
+  </section>
+
+</main>
+
+<footer class="site-footer">
+  <span>dotcode — built by Bilal Meriane</span>
+  <span><a href="mailto:omeriane0@gmail.com">omeriane0@gmail.com</a></span>
+</footer>
+
+<div class="modal-overlay" id="lockModal">
+  <div class="modal-box">
+    <h3>This language is locked</h3>
+    <p id="lockModalText"></p>
+    <p>Email <a href="mailto:omeriane0@gmail.com?subject=dotcode%20-%20unlock%20languages">omeriane0@gmail.com</a> to subscribe and unlock every language.</p>
+    <button class="btn btn-ghost" id="closeLockModal">Close</button>
+  </div>
+</div>
+
+<script src="app.js"></script>
+</body>
+</html>
