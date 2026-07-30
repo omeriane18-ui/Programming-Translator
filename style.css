@@ -1,5 +1,5 @@
 :root{
-  /* ==== themeable tokens (changed live by app.js) ==== */
+
   --accent: #e3b341;
   --accent-contrast: #0b0f14;
   --radius: 6px;
@@ -8,7 +8,6 @@
   --font-ui: 'Inter', sans-serif;
   --font-mono: 'JetBrains Mono', monospace;
 
-  /* ==== fixed structural palette ==== */
   --bg-deep: #0b0f14;
   --bg-panel: #121822;
   --bg-raised: #171f2b;
@@ -52,7 +51,6 @@ a:focus-visible, button:focus-visible, input:focus-visible, select:focus-visible
 }
 .skip-link:focus{ left:1rem; top:1rem; }
 
-/* ============ window-manager top bar ============ */
 .wm-bar{
   display:flex; align-items:center; gap:1.5rem;
   padding:calc(0.7rem * var(--space)) calc(1.2rem * var(--space));
@@ -73,7 +71,6 @@ a:focus-visible, button:focus-visible, input:focus-visible, select:focus-visible
 .status-dot{width:8px; height:8px; border-radius:50%; background:var(--danger); display:inline-block;}
 .status-dot.ok{background:#4fd67a;}
 
-/* ============ generic panel/section rhythm ============ */
 .panel{
   max-width:1100px;
   margin:0 auto;
@@ -81,7 +78,6 @@ a:focus-visible, button:focus-visible, input:focus-visible, select:focus-visible
 }
 .section-sub{color:var(--fg-dim); max-width:60ch;}
 
-/* ============ hero / translator ============ */
 .hero-heading h1{font-size:clamp(1.6rem, 3vw, 2.4rem); margin-bottom:.4rem;}
 .hero-sub{color:var(--fg-dim); max-width:65ch;}
 
@@ -163,7 +159,6 @@ a:focus-visible, button:focus-visible, input:focus-visible, select:focus-visible
   display:flex; align-items:center; justify-content:center; font-weight:600;
 }
 
-/* ============ rice / theme panel ============ */
 .rice-panel h2{margin-bottom:.2rem;}
 .rice-grid{display:grid; grid-template-columns:1fr 1fr; gap:2rem; margin-top:1.5rem;}
 .rice-presets{display:grid; grid-template-columns:repeat(2,1fr); gap:.8rem; align-content:start;}
@@ -182,7 +177,6 @@ a:focus-visible, button:focus-visible, input:focus-visible, select:focus-visible
   border-radius:calc(var(--radius) * .7); padding:.3em .5em; font-size:.9em;
 }
 
-/* ============ languages ============ */
 .lang-grid{display:grid; grid-template-columns:repeat(auto-fill, minmax(140px,1fr)); gap:.7rem; margin:1.5rem 0;}
 .lang-chip{
   border:1px solid var(--border-dim); border-radius:var(--radius);
@@ -195,7 +189,6 @@ a:focus-visible, button:focus-visible, input:focus-visible, select:focus-visible
 .lang-chip .lock-icon{opacity:.7;}
 .unlock-note{color:var(--fg-dim); font-size:.9em;}
 
-/* ============ buttons ============ */
 .btn{
   font-family:var(--font-mono); font-size:.85em; cursor:pointer;
   border-radius:var(--radius); padding:.5em .9em; border:1px solid var(--border-dim);
@@ -203,7 +196,6 @@ a:focus-visible, button:focus-visible, input:focus-visible, select:focus-visible
 .btn-ghost{background:transparent; color:var(--fg-primary);}
 .btn-ghost:hover{border-color:var(--accent); color:var(--accent);}
 
-/* ============ footer ============ */
 .site-footer{
   border-top:1px solid var(--border-dim);
   padding:1.5rem; display:flex; justify-content:space-between;
@@ -211,7 +203,6 @@ a:focus-visible, button:focus-visible, input:focus-visible, select:focus-visible
   max-width:1100px; margin:0 auto;
 }
 
-/* ============ modal ============ */
 .modal-overlay{
   display:none; position:fixed; inset:0; background:rgba(0,0,0,.6);
   align-items:center; justify-content:center; z-index:50;
@@ -222,7 +213,6 @@ a:focus-visible, button:focus-visible, input:focus-visible, select:focus-visible
   padding:1.5rem; max-width:380px; width:90%;
 }
 
-/* ============ responsive ============ */
 @media (max-width: 800px){
   .translator{grid-template-columns:1fr;}
   .translate-controls{flex-direction:row;}
