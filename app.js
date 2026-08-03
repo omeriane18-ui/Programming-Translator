@@ -1,4 +1,11 @@
+// dotcode — code translator, no backend, talks straight to Groq.
+// the key the visitor pastes in never leaves their browser except
+// to go to Groq's API. everything below is just DOM wiring + a
+// tiny theme engine, nothing fancy.
 
+// languages we support. first 7 (free: true) are open to everyone,
+// the rest are locked behind the "email me" paywall for now.
+// want to add one? just drop another object in here.
 const LANGUAGES = [
   { id: 'python', name: 'Python', free: true },
   { id: 'javascript', name: 'JavaScript', free: true },
@@ -18,6 +25,7 @@ const LANGUAGES = [
   { id: 'perl', name: 'Perl', free: false },
 ];
 
+// theme presets, aka the "rice" packs
 const PRESETS = [
   { id: 'amber', name: 'Amber CRT', accent: '#e3b341', bgDeep: '#0b0f14' },
   { id: 'nord', name: 'Nord', accent: '#88c0d0', bgDeep: '#0f1319' },
@@ -47,6 +55,9 @@ const LS_KEYS = {
 function $(id) {
   return document.getElementById(id);
 }
+
+// grabbing all the elements up front so the rest of the file
+// doesn't have to keep calling getElementById everywhere
 const fromLangSel = $('fromLang');
 const toLangSel = $('toLang');
 const sourceCode = $('sourceCode');
@@ -77,6 +88,8 @@ function populateLangSelects() {
       opt.textContent = l.name;
       sel.appendChild(opt);
     }
+    // default: source = first language, target = second one
+    // (or the same one if somehow there's only one free lang)
     sel.selectedIndex = i === 0 ? 0 : Math.min(1, freeLangs.length - 1);
   });
 }
@@ -103,9 +116,12 @@ function openLockModal(langName) {
 
 closeLockModal.addEventListener('click', () => lockModal.classList.remove('open'));
 lockModal.addEventListener('click', (e) => {
-
+  // only close if they clicked the dark overlay itself, not the box
   if (e.target === lockModal) lockModal.classList.remove('open');
 });
+
+// --- groq key handling ------------------------------------------------
+
 function loadKey() {
   const key = localStorage.getItem(LS_KEYS.groqKey) || '';
   const model = localStorage.getItem(LS_KEYS.model) || modelInput.value;
@@ -128,6 +144,9 @@ saveKeyBtn.addEventListener('click', () => {
   setStatus('Key saved in this browser.', 'ok');
   $('keyDrawer').removeAttribute('open');
 });
+
+// --- the actual translation call ---------------------------------------
+
 function setStatus(msg, kind) {
   statusLine.textContent = msg;
   statusLine.className = kind ? `status-line ${kind}` : 'status-line';
@@ -186,6 +205,8 @@ async function translateCode() {
     const data = await res.json();
     let result = (data.choices && data.choices[0] && data.choices[0].message.content) || '';
 
+    // Groq sometimes wraps the answer in a code fence even when we
+    // ask it not to, so strip that off if it's there.
     result = result.replace(/^```[a-zA-Z]*\n?/, '').replace(/```$/, '').trim();
 
     outputCode.value = result;
@@ -216,6 +237,10 @@ copyBtn.addEventListener('click', async () => {
   copyBtn.textContent = 'Copied!';
   setTimeout(() => { copyBtn.textContent = 'Copy'; }, 1500);
 });
+
+// --- theme / "rice" engine ----------------------------------------------
+// this part just pushes CSS variables onto :root and mirrors the
+// current values back into the controls so everything stays in sync.
 
 function applyTheme(theme) {
   const root = document.documentElement.style;
@@ -264,8 +289,8 @@ function loadTheme() {
   try {
     const saved = JSON.parse(localStorage.getItem(LS_KEYS.theme));
     return saved ? Object.assign({}, DEFAULT_THEME, saved) : Object.assign({}, DEFAULT_THEME);
-  } catch (e) 
-function loadTheme() {
+  } catch (e) {
+    // malformed json in localStorage, whatever, just fall back
     return Object.assign({}, DEFAULT_THEME);
   }
 }
@@ -317,6 +342,7 @@ function populatePresets() {
   });
 }
 
+// --- kick everything off --------------------------------------------------
 populateLangSelects();
 populateLangGrid();
 populatePresets();

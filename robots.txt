@@ -1,4 +1,4 @@
 User-agent: *
 Allow: /
 
-Sitemap: https://omeriane18-ui.github.io/Programming-Translator/sitemap.xml
+Sitemap: https://YOUR-GITHUB-USERNAME.github.io/YOUR-REPO-NAME/sitemap.xml
