@@ -1,0 +1,4 @@
+[
+  {"id":"i1","title":"Big Buck Bunny","type":"movie","year":"2008","genre":"أنيميشن","poster":"","desc":"فيلم أنيميشن قصير تجريبي — احذفه من لوحة التحكم وأضف أفلامك.","url":"https://www.youtube.com/watch?v=aqz-KE-bpKQ","eps":[]},
+  {"id":"i2","title":"Blender Shorts","type":"series","year":"2012","genre":"أنيميشن","poster":"","desc":"مسلسل تجريبي لتوضيح تشغيل الحلقات.","url":"","eps":[{"t":"الحلقة 1 - Sintel","u":"https://youtu.be/eRsGyueVLvQ"},{"t":"الحلقة 2 - Tears of Steel","u":"https://youtu.be/R6MlUcmOul8"}]}
+]

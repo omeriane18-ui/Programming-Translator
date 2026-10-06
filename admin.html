@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex,nofollow">
+<title>BFLIX | لوحة التحكم</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div id="lg" class="login">
+  <div class="logo" style="text-align:center">BFLIX</div>
+  <div style="text-align:center;color:var(--mu)">تسجيل دخول صاحب الموقع</div>
+  <input id="em" type="email" placeholder="البريد الإلكتروني" autocomplete="username">
+  <input id="pw" type="password" placeholder="كلمة المرور" autocomplete="current-password">
+  <button class="pri" id="go">دخول</button>
+  <div id="er" style="color:#ff6b6b;text-align:center;min-height:20px"></div>
+  <a href="./" style="text-align:center;color:var(--mu);font-size:14px">← العودة للموقع</a>
+</div>
+
+<div id="ap" style="display:none">
+<header>
+  <span class="logo">BFLIX <small style="font-size:14px;color:var(--mu)">لوحة التحكم</small></span>
+  <nav><a class="btn" href="./" target="_blank">عرض الموقع</a><button id="lo">خروج</button></nav>
+</header>
+<main>
+  <div class="panel">
+    <div class="fm">
+      <h2 id="fh">إضافة جديد</h2>
+      <div><label>العنوان</label><input id="t"></div>
+      <div><label>النوع</label><select id="ty"><option value="movie">فيلم</option><option value="series">مسلسل</option></select></div>
+      <div><label>السنة</label><input id="yr" placeholder="2024"></div>
+      <div><label>التصنيف</label><input id="gn" placeholder="أكشن، دراما..."></div>
+      <div><label>رابط الصورة (بوستر)</label><input id="po" placeholder="https://..."></div>
+      <div><label>القصة</label><textarea id="ds" rows="3"></textarea></div>
+      <div id="u1"><label>رابط الفيديو</label><div class="meta" style="margin:0 0 4px">يقبل: يوتيوب، فيميو، ديلي موشن، جوجل درايف، فيسبوك، ملف mp4 مباشر، بث m3u8، أو كود iframe كامل</div><input id="vu" placeholder="https://youtu.be/..."><label style="display:block;margin-top:8px">ملف الترجمة العربية (.vtt) — اختياري، للفيديو المباشر mp4 فقط</label><input id="sb" placeholder="subs/film-ar.vtt"></div>
+      <div id="u2" style="display:none"><label>الحلقات — كل سطر: عنوان الحلقة | الرابط | ملف الترجمة (اختياري)</label><textarea id="es" rows="6" placeholder="الحلقة 1 | https://youtu.be/xxxx&#10;الحلقة 2 | https://..."></textarea></div>
+      <div style="display:flex;gap:8px"><button class="pri" id="sv" style="flex:1">حفظ</button><button id="cn">جديد</button></div>
+    </div>
+    <div><h2>المحتوى (<span id="cnt">0</span>)</h2><div id="ls"></div></div>
+  </div>
+</main>
+</div>
+
+<script src="app.js"></script>
+<script type="module">
+import {auth,db,doc,setDoc,deleteDoc,signInWithEmailAndPassword,signOut,onAuthStateChanged,fetchItems,ADMIN} from './firebase.js';
+const $=i=>document.getElementById(i);
+let D=[],E=null;
+async function login(){
+  $('er').textContent='';
+  try{await signInWithEmailAndPassword(auth,$('em').value.trim(),$('pw').value)}
+  catch(e){$('er').textContent='البريد أو كلمة المرور غير صحيحة'}
+}
+$('go').onclick=login;$('pw').onkeydown=e=>{if(e.key==='Enter')login()};
+$('lo').onclick=()=>signOut(auth);
+onAuthStateChanged(auth,async u=>{
+  if(u&&u.email!==ADMIN){await signOut(auth);$('er').textContent='هذا الحساب ليس حساب صاحب الموقع';return}
+  if(u){$('lg').style.display='none';$('ap').style.display='block';await refresh()}
+  else{$('lg').style.display='';$('ap').style.display='none'}
+});
+async function refresh(){D=await fetchItems();list()}
+$('ty').onchange=()=>{const s=$('ty').value==='series';$('u1').style.display=s?'none':'block';$('u2').style.display=s?'block':'none'};
+function clear(){E=null;['t','yr','gn','po','ds','vu','sb','es'].forEach(i=>$(i).value='');$('ty').value='movie';$('ty').onchange();$('fh').textContent='إضافة جديد'}
+$('cn').onclick=clear;
+function list(){
+  $('cnt').textContent=D.length;
+  $('ls').innerHTML=D.map(x=>`<div class="row"><span>${esc(x.title)} <small style="color:var(--mu)">· ${x.type==='series'?'مسلسل':'فيلم'}</small></span><button onclick="edit('${esc(x.id)}')">تعديل</button><button class="del" onclick="del('${esc(x.id)}')">حذف</button></div>`).join('')||'<div class="empty">لا يوجد محتوى بعد</div>';
+}
+$('sv').onclick=async()=>{
+  const t=$('t').value.trim();if(!t)return alert('اكتب العنوان');
+  const ty=$('ty').value;
+  const eps=$('es').value.split('\n').map(l=>l.trim()).filter(Boolean).map(l=>{const p=l.split('|').map(s=>s.trim());return p.length<2?{t:'',u:p[0]}:{t:p[0],u:p[1],s:p[2]||''}});
+  if(ty==='movie'&&!$('vu').value.trim())return alert('ضع رابط الفيديو');
+  if(ty==='series'&&!eps.length)return alert('أضف حلقة واحدة على الأقل');
+  const id=E||('i'+Date.now());
+  const old=D.find(x=>x.id===id);
+  const o={title:t,type:ty,year:$('yr').value.trim(),genre:$('gn').value.trim(),poster:$('po').value.trim(),desc:$('ds').value.trim(),url:ty==='movie'?$('vu').value.trim():'',sub:ty==='movie'?$('sb').value.trim():'',eps:ty==='series'?eps:[],ts:old?.ts||Date.now()};
+  try{await setDoc(doc(db,'items',id),o);clear();await refresh()}
+  catch(e){alert('تعذر الحفظ: '+e.message)}
+};
+window.edit=id=>{
+  const x=D.find(i=>i.id===id);if(!x)return;E=id;
+  $('t').value=x.title;$('ty').value=x.type;$('yr').value=x.year||'';$('gn').value=x.genre||'';$('po').value=x.poster||'';$('ds').value=x.desc||'';$('vu').value=x.url||'';$('sb').value=x.sub||'';
+  $('es').value=(x.eps||[]).map(e=>e.t+' | '+e.u+(e.s?' | '+e.s:'')).join('\n');$('ty').onchange();$('fh').textContent='تعديل: '+x.title;scrollTo(0,0);
+};
+window.del=async id=>{if(!confirm('حذف نهائياً؟'))return;try{await deleteDoc(doc(db,'items',id));await refresh()}catch(e){alert('تعذر الحذف: '+e.message)}};
+</script>
+</body>
+</html>
